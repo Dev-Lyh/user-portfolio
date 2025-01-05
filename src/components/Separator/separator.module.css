@@ -1,0 +1,17 @@
+.container_separator {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2.4rem;
+  font-weight: 600;
+  color: #677489;
+  gap: .8rem;
+  font-size: 1.4rem;
+}
+
+.line_separator {
+  height: .1rem;
+  width: 100%;
+  background: #E3E8EF;
+}
