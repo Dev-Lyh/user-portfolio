@@ -28,3 +28,7 @@ body, input, button {
   font-size: 1.6rem;
   margin-bottom: 1.6rem;
 }
+
+.purple_button:disabled {
+  opacity: 0.5;
+}

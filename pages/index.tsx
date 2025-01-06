@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import {handleSignInWithEmailAndPassword} from '../src/utils/handleSignInWithEmailAndPassword'
+import {handleSignInWithEmailAndPassword} from '@/utils/handleSignInWithEmailAndPassword'
 import styles from './index.module.css'
 import TitleSubtitle from "@/components/TitleSubtitle";
 import LogoIcon from "@/assets/LogoIcon";
@@ -8,10 +8,14 @@ import Input from "@/components/Input";
 import Link from 'next/link';
 import Separator from "@/components/Separator";
 import {handleInputChange} from '@/utils/handleInputChange'
+import {useRouter} from 'next/router'
 
 export default function SignIn() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [error, setError] = useState('');
+
+  const router = useRouter();
 
   return (
     <section className={styles.sign_container}>
@@ -31,6 +35,9 @@ export default function SignIn() {
           <TitleSubtitle title={'Login to account'} subtitle={'Enter your credentials to access your account'}/>
           <GithubButton mode={'SIGNIN'}/>
           <Separator/>
+          {
+            error && <strong className={styles.error_message}>Account not found. Create an account.</strong>
+          }
           <Input type="email" placeholder='Enter email' onChangeValue={handleInputChange(setEmail)} mode={'NORMAL'}
                  inputValue={email}/>
           <Input type="password" placeholder='Enter a password' onChangeValue={handleInputChange(setPassword)}
@@ -39,7 +46,11 @@ export default function SignIn() {
             password</Link>
           <button
             className={'purple_button'}
-            onClick={() => handleSignInWithEmailAndPassword(email, password).then(res => console.log(res)).catch(err => console.error(err))}>Sign
+            type={"button"}
+            onClick={() => handleSignInWithEmailAndPassword(email, password).then(res => router.push({
+              pathname: '/profile_settings',
+              query: {uid: res.uid}
+            })).catch(err => setError(err))}>Sign
             In
           </button>
           <Link href={'/sign_up'} className={styles.link_forgot_password}>

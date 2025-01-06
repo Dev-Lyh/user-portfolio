@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import styles from './input.module.css';
 import CheckWhiteIcon from "@/assets/CheckWhiteIcon";
 import CheckPurpleIcon from "@/assets/CheckPurpleIcon";
@@ -9,10 +9,12 @@ interface InputProps {
   mode: 'NORMAL' | 'CREATE';
   inputValue: string;
 
+  handleIsDisabled(): void;
+
   onChangeValue(e: React.ChangeEvent<HTMLInputElement>): void;
 }
 
-export default function Input({type, placeholder, mode, inputValue, onChangeValue}: InputProps) {
+export default function Input({type, placeholder, mode, inputValue, onChangeValue, handleIsDisabled}: InputProps) {
   function hasLowercase(str: string): boolean {
     return /[a-z]/.test(str);
   }
@@ -32,6 +34,14 @@ export default function Input({type, placeholder, mode, inputValue, onChangeValu
   function hasMinimumLength(str: string, minLength: number = 8): boolean {
     return str.length >= minLength;
   }
+
+  useEffect(() => {
+    if (type === 'password') {
+      if (hasLowercase(inputValue) && hasSpecialCharacter(inputValue) && hasUppercase(inputValue) && hasMinimumLength(inputValue) && hasNumber(inputValue)) {
+        return handleIsDisabled();
+      }
+    }
+  }, [type, inputValue, handleIsDisabled])
 
   return (
     <>

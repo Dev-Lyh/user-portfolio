@@ -29,6 +29,15 @@
   max-width: 28.5rem;
 }
 
+.error_message {
+  color: #f18383;
+  margin-bottom: 1.2rem;
+  text-align: left;
+  width: 100%;
+  font-size: 1.2rem;
+  font-weight: 400;
+}
+
 .form_container {
   display: flex;
   align-items: center;

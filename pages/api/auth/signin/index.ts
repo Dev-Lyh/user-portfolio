@@ -8,9 +8,9 @@ export default async function handler(
   if (req.method === 'POST') {
     try {
 
-      const {email} = req.body;
+      const {} = req.body;
 
-      
+
     } catch (error) {
       res.status(500).json({error});
     }
