@@ -1,6 +1,9 @@
 import React, {useState} from 'react';
 import Link from 'next/link';
+import {useRouter} from 'next/router'
 import {sendEmailVerification} from 'firebase/auth';
+import {auth} from "../../firebaseConfig";
+
 import {handleCreateUserWithEmailAndPassword} from '@/utils/handleCreateUserWithEmailAndPassword'
 import {handleInputChange} from "@/utils/handleInputChange";
 
@@ -19,8 +22,17 @@ export default function SignUp() {
   const [password, setPassword] = useState('')
   const [isDisabled, setIsDisabled] = useState(true)
 
+  const router = useRouter();
+
   function handleIsDisabled() {
     setIsDisabled(false)
+  }
+
+  function handleOnCreateAccount() {
+    if (auth.currentUser) {
+      sendEmailVerification(auth.currentUser).then((value) => console.log(value));
+      router.push('/email_verification')
+    }
   }
 
   return (
@@ -38,7 +50,7 @@ export default function SignUp() {
                  mode={'CREATE'} inputValue={password} handleIsDisabled={handleIsDisabled}/>
           <button
             className={'purple_button'}
-            onClick={() => handleCreateUserWithEmailAndPassword(email, password).then(res => sendEmailVerification(res)).catch(err => console.error(err))}
+            onClick={() => handleCreateUserWithEmailAndPassword(email, password).then(handleOnCreateAccount).catch(err => console.error(err))}
             disabled={isDisabled}
             type={"button"}
           >

@@ -1,9 +1,10 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import Link from 'next/link';
 import {useRouter} from 'next/router'
 
 import {handleSignInWithEmailAndPassword} from '@/utils/handleSignInWithEmailAndPassword'
 import {handleInputChange} from '@/utils/handleInputChange'
+import {auth} from '../firebaseConfig'
 
 import LogoIcon from "@/assets/LogoIcon";
 
@@ -21,6 +22,10 @@ export default function SignIn() {
   const [error, setError] = useState('');
 
   const router = useRouter();
+
+  useEffect(() => {
+    console.log(auth.currentUser)
+  }, []);
 
   return (
     <section className={styles.sign_container}>

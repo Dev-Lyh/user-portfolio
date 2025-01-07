@@ -13,8 +13,7 @@ export default function GithubButton({mode}: GithubButtonProps) {
   return (
     <button type={"button"} className={styles.button}
             onClick={() => handleSignInWithGithub().then(res => router.push({
-              pathname: '/profile_settings',
-              query: {uid: res.uid}
+              pathname: `/profile_settings/${res.uid}`,
             })).catch(err => console.error(err))}>
       <GithubIcon/>
       {

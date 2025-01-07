@@ -1,5 +1,3 @@
-import Link from 'next/link';
-
 import LogoIcon from "@/assets/LogoIcon";
 
 import TitleSubtitle from "@/components/TitleSubtitle";
@@ -16,9 +14,6 @@ export default function EmailVerification() {
                     <LogoIcon/>
                     <TitleSubtitle title={'Verify your e-mail'}
                                    subtitle={'We send you an e-mail of verification.'}/>
-                    <Link href='/' className={styles.link_forgot_password}
-                          style={{textAlign: 'center', marginTop: '2.6rem'}}>After verified,
-                        go to login page.</Link>
                 </form>
             </div>
         </section>
