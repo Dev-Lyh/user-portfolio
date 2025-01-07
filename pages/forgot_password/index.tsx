@@ -1,26 +1,21 @@
 import React, {useState} from 'react'
-import styles from '../index.module.css'
-import TitleSubtitle from "@/components/TitleSubtitle";
-import LogoIcon from "@/assets/LogoIcon";
-import Input from "@/components/Input";
 import Link from 'next/link';
 import {handleInputChange} from "@/utils/handleInputChange";
+
+import LogoIcon from "@/assets/LogoIcon";
+
+import TitleSubtitle from "@/components/TitleSubtitle";
+import Input from "@/components/Input";
+import Aside from '@/components/Aside'
+
+import styles from '../index.module.css'
 
 export default function ForgetPassword() {
   const [email, setEmail] = useState('')
 
   return (
     <section className={styles.sign_container}>
-      <aside className={styles.aside_container}>
-        <strong>
-          Easy Portfolio for Developer
-        </strong>
-        <p>
-          As a web developer, having a portfolio is essential for showcasing your technical skills and attracting
-          potential clients. A portfolio is a museum of your work, with past tech stacks, case studies, and your work
-          history.
-        </p>
-      </aside>
+      <Aside/>
       <div className={styles.form_container}>
         <form>
           <LogoIcon/>

@@ -1,0 +1,22 @@
+.aside_container {
+    background-image: url('/circles-to-login.svg'), linear-gradient(to bottom, #838CF1 0%, #4138C2 100%);
+    background-repeat: no-repeat;
+    background-position: left bottom;
+    padding: 4rem 2.4rem;
+    width: 46.8rem;
+    height: 100%;
+    border-radius: 1.2rem;
+    color: #ffffff;
+}
+
+.aside_container strong {
+    font-size: 1.6rem;
+    font-weight: bolder;
+}
+
+.aside_container p {
+    margin-top: 1.2rem;
+    font-size: 1.4rem;
+    font-weight: lighter;
+    max-width: 28.5rem;
+}

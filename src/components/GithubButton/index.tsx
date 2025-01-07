@@ -4,7 +4,7 @@ import {handleSignInWithGithub} from "@/utils/handleSignInWithGithub";
 import {useRouter} from 'next/router';
 
 interface GithubButtonProps {
-  mode: "SINGUP" | "SIGNIN";
+  mode: "SIGNUP" | "SIGNIN";
 }
 
 export default function GithubButton({mode}: GithubButtonProps) {

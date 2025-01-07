@@ -1,22 +1,27 @@
-import {signInWithEmailAndPassword} from 'firebase/auth';
+import {createUserWithEmailAndPassword} from 'firebase/auth';
 import {auth} from '../../firebaseConfig';
 
-export function handleSignInWithEmailAndPassword(email: string, password: string): Promise<object> {
+export function handleCreateUserWithEmailAndPassword(
+  email: string,
+  password: string
+): Promise<object> {
   return new Promise((resolve, reject) => {
-    signInWithEmailAndPassword(auth, email, password)
+    createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         const userObject = userCredential.user;
-        console.log({userObject})
+
         resolve(userObject)
       })
       .catch((error) => {
         const errorCode = error.code;
         const errorMessage = error.message;
+
         const errorObject = {
           errorCode,
-          errorMessage,
-        };
-        reject(errorObject); // Rejeita a Promise com o erro
+          errorMessage
+        }
+
+        reject(errorObject)
       });
-  });
+  })
 }

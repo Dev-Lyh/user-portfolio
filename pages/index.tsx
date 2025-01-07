@@ -1,14 +1,19 @@
 import React, {useState} from 'react'
+import Link from 'next/link';
+import {useRouter} from 'next/router'
+
 import {handleSignInWithEmailAndPassword} from '@/utils/handleSignInWithEmailAndPassword'
-import styles from './index.module.css'
-import TitleSubtitle from "@/components/TitleSubtitle";
+import {handleInputChange} from '@/utils/handleInputChange'
+
 import LogoIcon from "@/assets/LogoIcon";
+
+import TitleSubtitle from "@/components/TitleSubtitle";
 import GithubButton from "@/components/GithubButton";
 import Input from "@/components/Input";
-import Link from 'next/link';
 import Separator from "@/components/Separator";
-import {handleInputChange} from '@/utils/handleInputChange'
-import {useRouter} from 'next/router'
+import Aside from '@/components/Aside';
+
+import styles from './index.module.css'
 
 export default function SignIn() {
   const [email, setEmail] = useState('')
@@ -19,16 +24,7 @@ export default function SignIn() {
 
   return (
     <section className={styles.sign_container}>
-      <aside className={styles.aside_container}>
-        <strong>
-          Easy Portfolio for Developer
-        </strong>
-        <p>
-          As a web developer, having a portfolio is essential for showcasing your technical skills and attracting
-          potential clients. A portfolio is a museum of your work, with past tech stacks, case studies, and your work
-          history.
-        </p>
-      </aside>
+      <Aside/>
       <div className={styles.form_container}>
         <form>
           <LogoIcon/>
@@ -48,8 +44,7 @@ export default function SignIn() {
             className={'purple_button'}
             type={"button"}
             onClick={() => handleSignInWithEmailAndPassword(email, password).then(res => router.push({
-              pathname: '/profile_settings',
-              query: {uid: res.uid}
+              pathname: `/profile_settings/${res.uid}`,
             })).catch(err => setError(err))}>Sign
             In
           </button>

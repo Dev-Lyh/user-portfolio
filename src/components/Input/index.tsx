@@ -1,7 +1,9 @@
 import React, {useEffect} from 'react'
-import styles from './input.module.css';
+
 import CheckWhiteIcon from "@/assets/CheckWhiteIcon";
 import CheckPurpleIcon from "@/assets/CheckPurpleIcon";
+
+import styles from './input.module.css';
 
 interface InputProps {
   type: string;
@@ -9,7 +11,7 @@ interface InputProps {
   mode: 'NORMAL' | 'CREATE';
   inputValue: string;
 
-  handleIsDisabled(): void;
+  handleIsDisabled?: () => void;
 
   onChangeValue(e: React.ChangeEvent<HTMLInputElement>): void;
 }
@@ -36,12 +38,18 @@ export default function Input({type, placeholder, mode, inputValue, onChangeValu
   }
 
   useEffect(() => {
-    if (type === 'password') {
-      if (hasLowercase(inputValue) && hasSpecialCharacter(inputValue) && hasUppercase(inputValue) && hasMinimumLength(inputValue) && hasNumber(inputValue)) {
-        return handleIsDisabled();
+    if (type === 'password' && placeholder.includes('Enter a new password')) {
+      if (
+        hasLowercase(inputValue) &&
+        hasSpecialCharacter(inputValue) &&
+        hasUppercase(inputValue) &&
+        hasMinimumLength(inputValue) &&
+        hasNumber(inputValue)
+      ) {
+        handleIsDisabled?.();
       }
     }
-  }, [type, inputValue, handleIsDisabled])
+  }, [type, placeholder, inputValue, handleIsDisabled]);
 
   return (
     <>
