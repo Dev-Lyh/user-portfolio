@@ -27,6 +27,7 @@
     top: 7.4rem;
     right: 2.4rem;
     background: #ffffff;
+    box-shadow: 0 .4rem .4rem -.1rem #11172905;
 }
 
 .header_menu {
@@ -48,21 +49,25 @@
     justify-content: center;
     cursor: pointer;
 }
+
 .header_menu_text {
     display: flex;
     align-items: flex-start;
     flex-direction: column;
     gap: .4rem;
 }
+
 .header_menu_text p {
     font-size: 1.4rem;
     font-weight: 500;
     color: #20293A;
 }
+
 .header_menu_text span {
     font-size: 1.2rem;
     color: #677489;
 }
+
 .header_options {
     display: flex;
     flex-direction: column;
@@ -71,6 +76,7 @@
     padding: 1.6rem;
     border-bottom: .1rem solid #E3E8EF;
 }
+
 .header_options_title {
     font-size: 1.2rem;
     color: #677489;
@@ -87,8 +93,9 @@
     color: #20293A;
     font-size: 1.4rem;
     font-weight: 500;
-    border-radius: 1rem;
+    border-radius: .4rem;
 }
+
 .header_options button:hover {
     background: #20293A10;
     cursor: pointer;

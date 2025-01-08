@@ -14,19 +14,23 @@ body {
   font-size: 1.6rem;
 }
 
-body, input, button {
+body, input, button, textarea {
   font-family: 'Inter', sans-serif;
+  resize: none;
 }
 
 .purple_button {
   background: #6466E9;
   width: 100%;
-  padding: .8rem 0;
   border-radius: .8rem;
   border: 0 none;
   color: #ffffff;
   font-size: 1.6rem;
   margin-bottom: 1.6rem;
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  padding: .8rem 1.2rem;
 }
 
 .purple_button:disabled {
