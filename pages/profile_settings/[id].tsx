@@ -2,6 +2,7 @@ import {useEffect, useState} from 'react'
 import {useRouter} from 'next/router'
 import {User} from '@/types/User'
 import {auth} from '../../firebaseConfig'
+import Header from "@/components/Header";
 
 export default function ProfileSettings() {
     const [user, setUser] = useState<User>();
@@ -19,7 +20,10 @@ export default function ProfileSettings() {
 
     return (
         <section>
-            {id}
+            <Header user={user}/>
+            <section>
+                
+            </section>
         </section>
     )
 }
