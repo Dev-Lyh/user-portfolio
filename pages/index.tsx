@@ -23,10 +23,6 @@ export default function SignIn() {
 
   const router = useRouter();
 
-  useEffect(() => {
-    console.log(auth.currentUser)
-  }, []);
-
   return (
     <section className={styles.sign_container}>
       <Aside/>

@@ -6,7 +6,6 @@ export function handleSignInWithEmailAndPassword(email: string, password: string
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         const userObject = userCredential.user;
-        console.log({userObject})
         resolve(userObject)
       })
       .catch((error) => {

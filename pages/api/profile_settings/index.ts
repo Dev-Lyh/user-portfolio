@@ -1,13 +1,12 @@
 import {NextApiRequest, NextApiResponse} from 'next';
-import {getDoc, doc} from 'firebase/firestore';
+import {getDoc, doc, setDoc} from 'firebase/firestore';
 import {db} from '../../../firebaseConfig';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    const {id} = req.query;
+    const {id, email} = req.query;
 
     if (req.method === 'GET') {
-        // Validar se ID está presente e é uma string
-        if (!id) {
+        if (!id || typeof id !== "string") {
             return res.status(400).json({error: "Invalid or missing user ID"});
         }
 
@@ -18,7 +17,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 const user = docSnap.data();
                 return res.status(200).json({user});
             } else {
-                return res.status(404).json({error: "User not found"});
+                const user = {
+                    bio: "",
+                    email: email,
+                    job_title: "",
+                    name: ""
+                }
+                await setDoc(doc(db, "users", id), user)
+                return res.status(201).json(user);
             }
         } catch (error) {
             console.error("Error fetching user:", error);
