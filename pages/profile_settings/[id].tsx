@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react'
+import {useEffect, useState, useRef} from 'react'
 import {useRouter} from 'next/router'
 import {User} from '@/types/User'
 import {auth} from '../../firebaseConfig'
@@ -10,18 +10,55 @@ import UploadIcon from "@/assets/UploadIcon";
 import TrashRedIcon from "@/assets/TrashRedIcon";
 import styles from "./profile_settings.module.css"
 import Textarea from "@/components/Textarea";
+import {userMock} from "@/mocks/userMock";
+import {readImageDimensions} from "@/utils/readImageDimensions";
 
 export default function ProfileSettings() {
-    const [user, setUser] = useState<User>();
+    const [user, setUser] = useState<User>(userMock);
+    const [error, setError] = useState();
+    const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB em bytes
+    const MAX_WIDTH = 256; // Largura máxima
+    const MAX_HEIGHT = 256; // Altura máxima
 
     const router = useRouter();
     const id = router.query.id;
+
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    const handleButtonClick = () => {
+        if (inputRef.current) {
+            inputRef.current.click(); // Simula o clique no input
+        }
+    };
+
+    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files && event.target.files.length > 0) {
+            const file = event.target.files[0];
+
+            if (file.size > MAX_FILE_SIZE) {
+                setError("The file exceeds the maximum allowed size of 2MB.");
+                return;
+            }
+
+            const image = await readImageDimensions(file);
+            if (image.width > MAX_WIDTH || image.height > MAX_HEIGHT) {
+                setError(
+                    `Image dimensions exceed what is allowed. Maximum: ${MAX_WIDTH}x${MAX_HEIGHT}px`
+                );
+                return;
+            }
+
+            setError("")
+        }
+    };
 
     useEffect(() => {
         if (auth.currentUser) {
             fetch(`/api/profile_settings?id=${id}&email=${auth.currentUser.email}`, {
                 method: 'GET'
-            }).then(res => res.json()).then(json => setUser(json)).catch(err => console.error(err));
+            }).then(res => res.json()).then(json => {
+                setUser(json.user);
+            }).catch(err => console.error(err));
         }
     }, [id])
 
@@ -37,11 +74,21 @@ export default function ProfileSettings() {
                             <ProfileIcon/>
                         </div>
                         <span>Image must be 256 x 256px - max 2MB</span>
+                        {
+                            error && <span style={{color: "#DD524C", fontWeight: 700}}>{error}</span>
+                        }
                         <div className={styles.action_buttons_container}>
-                            <button type={"button"} style={{color: "#20293A"}}>
+                            <button type={"button"} style={{color: "#20293A"}} onClick={handleButtonClick}>
                                 <UploadIcon/>
                                 Upload Profile Image
                             </button>
+                            <input
+                                ref={inputRef}
+                                type="file"
+                                accept={"image/png, image/jpeg, image/jpg"}
+                                style={{display: "none"}} // Oculta o input
+                                onChange={handleFileChange}
+                            />
                             <button type={"button"} style={{color: "#DD524C"}}>
                                 <TrashRedIcon/>
                                 Delete Image
@@ -52,26 +99,55 @@ export default function ProfileSettings() {
                         <div className={styles.grid_inputs_container}>
                             <div>
                                 <label htmlFor="email_form">Email</label>
-                                <Input type={"email"} inputValue={user?.email || ""} mode={"NORMAL"}
+                                <Input type={"email"} inputValue={user.email}
+                                       mode={"NORMAL"}
+                                       disabled={true}
                                        placeholder={"Enter your email"} onChangeValue={() => {
                                 }}/>
                             </div>
                             <div>
                                 <label htmlFor="job_title_form">Job title</label>
-                                <Input type={"text"} inputValue={user?.job_title || ""} mode={"NORMAL"}
-                                       placeholder={"Enter your job title"} onChangeValue={() => {
-                                }}/>
+                                <Input
+                                    type={"text"}
+                                    inputValue={user.job_title}
+                                    mode={"NORMAL"}
+                                    placeholder={"Enter your job title"}
+                                    onChangeValue={(e) => {
+                                        setUser((prevState) => ({
+                                            ...prevState,
+                                            job_title: e.target.value,
+                                        }));
+                                    }}
+                                />
                             </div>
                             <div>
                                 <label htmlFor="name_form">Name</label>
-                                <Input type={"text"} inputValue={user?.name || ""} mode={"NORMAL"}
-                                       placeholder={"Enter your name"} onChangeValue={() => {
-                                }}/>
+                                <Input
+                                    type={"text"}
+                                    inputValue={user.name}
+                                    mode={"NORMAL"}
+                                    placeholder={"Enter your name"}
+                                    onChangeValue={(e) => {
+                                        setUser((prevState) => ({
+                                            ...prevState,
+                                            name: e.target.value,
+                                        }));
+                                    }}
+                                />
                             </div>
                         </div>
                         <div className={styles.container_bio_textarea}>
                             <label htmlFor="bio_form">Bio</label>
-                            <Textarea placeholder={"Enter a short introduction..."}/>
+                            <Textarea
+                                placeholder={"Enter a short introduction..."}
+                                onChangeValue={(e) => {
+                                    setUser((prevState) => ({
+                                        ...prevState,
+                                        bio: e.target.value,
+                                    }));
+                                }}
+                                inputValue={user.bio}
+                            />
                         </div>
                     </form>
                     <div className={styles.purple_button_container}>

@@ -10,13 +10,22 @@ interface InputProps {
   placeholder: string;
   mode: 'NORMAL' | 'CREATE';
   inputValue: string;
+  disabled?: boolean;
 
   handleIsDisabled?: () => void;
 
   onChangeValue(e: React.ChangeEvent<HTMLInputElement>): void;
 }
 
-export default function Input({type, placeholder, mode, inputValue, onChangeValue, handleIsDisabled}: InputProps) {
+export default function Input({
+                                type,
+                                placeholder,
+                                mode,
+                                inputValue,
+                                onChangeValue,
+                                handleIsDisabled,
+                                disabled
+                              }: InputProps) {
   function hasLowercase(str: string): boolean {
     return /[a-z]/.test(str);
   }
@@ -54,7 +63,8 @@ export default function Input({type, placeholder, mode, inputValue, onChangeValu
   return (
     <>
       <input className={styles.input} type={type} placeholder={placeholder} onChange={onChangeValue}
-             style={{marginTop: placeholder.includes('Enter a new password') ? '2.6rem' : 0}}/>
+             style={{marginTop: placeholder.includes('Enter a new password') ? '2.6rem' : 0}}
+             defaultValue={inputValue} disabled={disabled}/>
       {
         mode === 'CREATE' &&
         type === 'password' &&
