@@ -13,6 +13,7 @@ export const config = {
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "POST") {
+    const {id} = req.query;
     const form = formidable({multiples: false});
 
     try {
@@ -28,7 +29,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
 
       // Validação dos dados
-      const {name, bio} = fields;
+      const {name, bio, job_title} = fields;
       if (!name || !bio) {
         return res.status(400).json({error: "Nome e biografia são obrigatórios."});
       }
@@ -50,20 +51,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       if (file) {
         const fileBuffer = await fs.promises.readFile(file.filepath);
-        const storageRef = ref(storage, `profiles/${file.originalFilename}`);
+        const storageRef = ref(storage, `profiles/${id}/${file.originalFilename}`);
         await uploadBytes(storageRef, fileBuffer);
 
         // Gerar URL pública
         fileUrl = `https://firebasestorage.googleapis.com/v0/b/${
           process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
-        }/o/${encodeURIComponent(`profiles/${file.originalFilename}`)}?alt=media`;
+        }/o/${encodeURIComponent(`profiles/${id}/${file.originalFilename}`)}?alt=media`;
       }
 
       // Simula salvar os dados em um banco de dados (pode integrar ao Firestore)
       const profile = {
         name,
         bio,
-        imageUrl: fileUrl,
+        job_title,
+        img_path: fileUrl,
       };
 
       console.log("Perfil cadastrado:", profile);

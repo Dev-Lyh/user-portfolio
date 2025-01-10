@@ -1,4 +1,4 @@
-import {useEffect, useState, useRef} from 'react'
+import React, {useEffect, useState, useRef} from 'react'
 import {useRouter} from 'next/router'
 import {User} from '@/types/User'
 import {auth} from '../../firebaseConfig'
@@ -12,10 +12,12 @@ import styles from "./profile_settings.module.css"
 import Textarea from "@/components/Textarea";
 import {userMock} from "@/mocks/userMock";
 import {readImageDimensions} from "@/utils/readImageDimensions";
+import {uploadProfile} from "@/utils/uploadProfile";
 
 export default function ProfileSettings() {
     const [user, setUser] = useState<User>(userMock);
-    const [error, setError] = useState();
+    const [error, setError] = useState("");
+    const [file, setFile] = useState<File>();
     const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB em bytes
     const MAX_WIDTH = 256; // Largura máxima
     const MAX_HEIGHT = 256; // Altura máxima
@@ -33,20 +35,22 @@ export default function ProfileSettings() {
 
     const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files.length > 0) {
-            const file = event.target.files[0];
+            const _file = event.target.files[0];
 
-            if (file.size > MAX_FILE_SIZE) {
+            if (_file.size > MAX_FILE_SIZE) {
                 setError("The file exceeds the maximum allowed size of 2MB.");
                 return;
             }
 
-            const image = await readImageDimensions(file);
+            const image = await readImageDimensions(_file);
             if (image.width > MAX_WIDTH || image.height > MAX_HEIGHT) {
                 setError(
                     `Image dimensions exceed what is allowed. Maximum: ${MAX_WIDTH}x${MAX_HEIGHT}px`
                 );
                 return;
             }
+
+            setFile(_file)
 
             setError("")
         }
@@ -151,7 +155,14 @@ export default function ProfileSettings() {
                         </div>
                     </form>
                     <div className={styles.purple_button_container}>
-                        <button type="button" className={`purple_button`}>
+                        <button type="button" className={`purple_button`}
+                                onClick={() => {
+                                    if (!file) {
+                                        alert("File is empty!")
+                                    } else {
+                                        uploadProfile(file, user.name, user.bio, user.job_title, id)
+                                    }
+                                }}>
                             <CheckWhiteIcon/>
                             Save
                         </button>
