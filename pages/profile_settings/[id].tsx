@@ -13,11 +13,13 @@ import Textarea from "@/components/Textarea";
 import {userMock} from "@/mocks/userMock";
 import {readImageDimensions} from "@/utils/readImageDimensions";
 import {uploadProfile} from "@/utils/uploadProfile";
+import Image from "next/image"
 
 export default function ProfileSettings() {
     const [user, setUser] = useState<User>(userMock);
     const [error, setError] = useState("");
     const [file, setFile] = useState<File>();
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB em bytes
     const MAX_WIDTH = 256; // Largura máxima
     const MAX_HEIGHT = 256; // Altura máxima
@@ -51,9 +53,15 @@ export default function ProfileSettings() {
             }
 
             setFile(_file)
+            setPreviewUrl(URL.createObjectURL(_file));
 
             setError("")
         }
+    };
+
+    const handleDeleteImage = () => {
+        setFile(undefined);
+        setPreviewUrl(null);
     };
 
     useEffect(() => {
@@ -61,7 +69,7 @@ export default function ProfileSettings() {
             fetch(`/api/profile_settings?id=${id}&email=${auth.currentUser.email}`, {
                 method: 'GET'
             }).then(res => res.json()).then(json => {
-                setUser(json.user);
+                setUser(json);
             }).catch(err => console.error(err));
         }
     }, [id])
@@ -75,7 +83,17 @@ export default function ProfileSettings() {
                 <section className={styles.profile_settings_container}>
                     <section className={styles.select_image_container}>
                         <div className={styles.profile_image_container}>
-                            <ProfileIcon/>
+                            {previewUrl ? (
+                                <Image
+                                    src={!user.img_url ? previewUrl : user.img_url}
+                                    alt="Profile preview"
+                                    className={styles.profile_image}
+                                    width={52}
+                                    height={52}
+                                />
+                            ) : (
+                                <ProfileIcon/>
+                            )}
                         </div>
                         <span>Image must be 256 x 256px - max 2MB</span>
                         {
@@ -89,11 +107,13 @@ export default function ProfileSettings() {
                             <input
                                 ref={inputRef}
                                 type="file"
-                                accept={"image/png, image/jpeg, image/jpg"}
-                                style={{display: "none"}} // Oculta o input
+                                name="file"
+                                accept="image/png, image/jpeg, image/jpg"
+                                style={{display: "none"}}
                                 onChange={handleFileChange}
                             />
-                            <button type={"button"} style={{color: "#DD524C"}}>
+
+                            <button type={"button"} style={{color: "#DD524C"}} onClick={handleDeleteImage}>
                                 <TrashRedIcon/>
                                 Delete Image
                             </button>
@@ -157,7 +177,7 @@ export default function ProfileSettings() {
                     <div className={styles.purple_button_container}>
                         <button type="button" className={`purple_button`}
                                 onClick={() => {
-                                    if (!file) {
+                                    if (!file || !id || typeof id != 'string') {
                                         alert("File is empty!")
                                     } else {
                                         uploadProfile(file, user.name, user.bio, user.job_title, id)

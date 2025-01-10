@@ -4,5 +4,5 @@ export interface User {
     job_title: string,
     name: string,
     bio: string,
-    img_path?: string
+    img_url?: string
 }

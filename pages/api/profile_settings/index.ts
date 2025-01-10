@@ -1,6 +1,7 @@
 import {NextApiRequest, NextApiResponse} from 'next';
 import {getDoc, doc, setDoc} from 'firebase/firestore';
-import {db} from '../../../firebaseConfig';
+import {db, storage} from '../../../firebaseConfig';
+import {getDownloadURL, ref} from "firebase/storage";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     const {id, email} = req.query;
@@ -15,13 +16,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
             if (docSnap.exists()) {
                 const user = docSnap.data();
-                return res.status(200).json({user});
+                const imgRef = ref(storage, `profiles/${id}/profile_picture`);
+                try {
+                    user.img_url = await getDownloadURL(imgRef); // Tenta obter a URL
+                    console.log(user)
+                    return res.status(200).json({...user});
+                } catch (error) {
+                    if (error.code === "storage/object-not-found") {
+                        console.log("Imagem não encontrada no Storage.");
+                        return res.status(200).json({...user, img_url: null}); // Retorna null para img_url
+                    } else {
+                        console.error("Erro ao verificar a imagem:", error);
+                        return res.status(500).json({error: "Erro ao buscar a imagem do usuário."});
+                    }
+                }
             } else {
                 const user = {
                     bio: "",
                     email: email,
                     job_title: "",
-                    name: ""
+                    name: "",
+                    img_path: ""
                 }
                 await setDoc(doc(db, "users", id), user)
                 return res.status(201).json(user);
