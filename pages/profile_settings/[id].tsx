@@ -77,7 +77,7 @@ export default function ProfileSettings() {
 
     return (
         <section>
-            <Header user={user}/>
+            <Header user={user} id={id}/>
             <section className={styles.general_container}>
                 <h1>Profile settings</h1>
 

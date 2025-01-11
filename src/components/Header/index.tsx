@@ -9,13 +9,18 @@ import ProjectIcon from "@/assets/ProjectIcon";
 import MyPortfolioIcon from "@/assets/MyPortfolioIcon";
 import LinkIcon from "@/assets/LinkIcon";
 import LogoutIcon from "@/assets/LogoutIcon";
+import {useRouter} from "next/router"
 
 interface HeaderProps {
+    id: string;
     user: User
 }
 
-export default function HeaderComponent({user}: HeaderProps) {
+export default function HeaderComponent({id, user}: HeaderProps) {
     const [isModalShow, setIsModalShow] = useState(false)
+
+    const router = useRouter();
+
     return (
         <header className={styles.header_container}>
             <LogoIcon/>
@@ -54,11 +59,11 @@ export default function HeaderComponent({user}: HeaderProps) {
                         </div>
                         <div className={styles.header_options}>
                             <p className={styles.header_options_title}>Account</p>
-                            <button type={'button'}>
+                            <button type={'button'} onClick={() => router.push(`/profile_settings/${id}`)}>
                                 <ProfileGrayIcon/>
                                 <p>Profile settings</p>
                             </button>
-                            <button type={'button'}>
+                            <button type={'button'} onClick={() => router.push(`/projects_settings/${id}`)}>
                                 <ProjectIcon/>
                                 <p>Projects settings</p>
                             </button>
