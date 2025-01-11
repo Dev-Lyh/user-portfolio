@@ -70,6 +70,7 @@ export default function ProfileSettings() {
                 method: 'GET'
             }).then(res => res.json()).then(json => {
                 setUser(json);
+                setPreviewUrl(json.img_url)
             }).catch(err => console.error(err));
         }
     }, [id])
@@ -85,7 +86,7 @@ export default function ProfileSettings() {
                         <div className={styles.profile_image_container}>
                             {previewUrl ? (
                                 <Image
-                                    src={!user.img_url ? previewUrl : user.img_url}
+                                    src={previewUrl}
                                     alt="Profile preview"
                                     className={styles.profile_image}
                                     width={52}

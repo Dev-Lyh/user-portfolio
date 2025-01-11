@@ -21,12 +21,14 @@ export default function HeaderComponent({user}: HeaderProps) {
             <LogoIcon/>
 
             {
-                user?.img_path ?
+                user?.img_url ?
                     <div className={styles.profile_container} onClick={() => setIsModalShow(!isModalShow)}>
-                        <Image src={user?.img_path} alt="user profile picture"/>
+                        <Image src={user?.img_url} alt="user profile picture" width={40} height={40}
+                               style={{borderRadius: 20}}/>
                     </div>
                     :
-                    <div className={styles.profile_container} onClick={() => setIsModalShow(!isModalShow)}>
+                    <div className={styles.profile_container}
+                         onClick={() => setIsModalShow(!isModalShow)}>
                         <ProfileWhiteIcon/>
                     </div>
             }
@@ -35,9 +37,10 @@ export default function HeaderComponent({user}: HeaderProps) {
                     <div className={styles.container_profile_menu}>
                         <div className={styles.header_menu}>
                             {
-                                user?.img_path ?
+                                user?.img_url ?
                                     <div className={styles.profile_container_mini}>
-                                        <Image src={user?.img_path} alt="user profile picture"/>
+                                        <Image src={user?.img_url} alt="user profile picture" width={32} height={32}
+                                               style={{borderRadius: 16}}/>
                                     </div>
                                     :
                                     <div className={styles.profile_container_mini}>
@@ -45,8 +48,8 @@ export default function HeaderComponent({user}: HeaderProps) {
                                     </div>
                             }
                             <div className={styles.header_menu_text}>
-                                <p>hfjs</p>
-                                <span>dagrs</span>
+                                <p>{user.name}</p>
+                                <span>{user.email}</span>
                             </div>
                         </div>
                         <div className={styles.header_options}>
