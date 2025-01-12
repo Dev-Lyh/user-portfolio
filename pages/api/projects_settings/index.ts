@@ -3,16 +3,18 @@ import {db, storage} from '../../../firebaseConfig';
 import {getDocs, query, where, collection, addDoc, updateDoc, doc} from 'firebase/firestore';
 import {Project} from "@/types/Project"
 import formidable, {Fields, Files} from "formidable";
-import {ref, uploadBytes} from "firebase/storage";
+import {ref, uploadBytes, getDownloadURL} from "firebase/storage";
+
 import fs from "fs";
+
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const {id} = req.query;
-  const form = formidable({
-    multiples: false,
-    uploadDir: "./uploads",
-    keepExtensions: true,
-  });
 
   if (!id || typeof id !== "string") {
     return res.status(400).json({error: "Invalid or missing user ID"});
@@ -23,27 +25,39 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
       const q = query(collection(db, "projects"), where("user_id", "==", id));
       const projectsSnapshot = await getDocs(q);
-      const projects: Array<Project> = [];
 
-      projectsSnapshot.forEach((doc) => {
-        projects.push({
-          id: doc.id,
-          user_id: doc.data().user_id,
-          img_url: doc.data().img_url,
-          name: doc.data().name,
-          repository_url: doc.data().repository_url,
-          demo_url: doc.data().demo_url,
-          description: doc.data().description,
-        });
-      });
+      const projects: Array<Project> = projectsSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        user_id: doc.data().user_id,
+        img_url: doc.data().img_url,
+        name: doc.data().name,
+        repository_url: doc.data().repository_url,
+        demo_url: doc.data().demo_url,
+        description: doc.data().description,
+      }));
 
-      res.status(200).json(projects);
+      const updatedProjects = await Promise.all(
+        projects.map(async (project) => {
+          const imgRef = ref(storage, project.img_url);
+          const imgURL = await getDownloadURL(imgRef);
+          return {
+            ...project,
+            img_url: imgURL
+          }
+        })
+      )
+
+      res.status(200).json(updatedProjects);
     } catch (error) {
       console.error("Error fetching projects:", error);
       res.status(500).json({error: "Failed to fetch projects"});
     }
   } else if (req.method === "POST") {
-
+    const form = formidable({
+      multiples: false,
+      uploadDir: "./uploads",
+      keepExtensions: true,
+    });
     try {
       const {fields, files} = await new Promise<{
         fields: Fields;
@@ -54,9 +68,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           resolve({fields, files});
         });
       });
-
-      const {user_id, name, img_url, repository_url, demo_url, description, id} = fields;
-      if (!user_id || !name || !img_url || !repository_url || !demo_url || !description) {
+      const {user_id, name, repository_url, demo_url, description, id} = fields;
+      if (!user_id || !name || !repository_url || !demo_url || !description) {
         return res.status(400).json({error: "Nome e biografia são obrigatórios."});
       }
 
@@ -84,13 +97,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       if (id) {
         const docRef = doc(db, "projects", id[0]);
         await updateDoc(docRef, project);
-        return res.status(200).json({...project, id});
+        return res.status(200).json({...project, id: id[0]});
       } else {
         const docRef = await addDoc(collection(db, "projects"), project);
         const project_id = docRef.id;
-        return res.status(200).json({...project, id: project_id});
+        return res.status(200).json({message: project_id});
       }
-
 
     } catch (error) {
       return res.status(500).json({error});

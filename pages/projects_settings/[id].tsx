@@ -5,8 +5,6 @@ import {Project} from '@/types/Project'
 import {auth} from '../../firebaseConfig'
 import Header from "@/components/Header";
 import Input from "@/components/Input";
-import CheckWhiteIcon from "@/assets/CheckWhiteIcon";
-import ProfileIcon from "@/assets/ProfileGrayIcon";
 import UploadIcon from "@/assets/UploadIcon";
 import TrashRedIcon from "@/assets/TrashRedIcon";
 import styles from "./projects_settings.module.css"
@@ -25,7 +23,7 @@ import ProjectCard from "@/components/ProjectCard";
 export default function ProjectsSettings() {
     const [user, setUser] = useState<User>(userMock);
     const [project, setProject] = useState<Project>(projectMock)
-    const [projects, setProjects] = useState<null | Project[]>(null)
+    const [projects, setProjects] = useState<Project[]>([])
     const [projectId, setProjectId] = useState("")
     const [error, setError] = useState("");
     const [file, setFile] = useState<File>();
@@ -80,7 +78,7 @@ export default function ProjectsSettings() {
 
     useEffect(() => {
         if (auth.currentUser) {
-            fetch(`/api/projects_settings?id=${id}}`, {
+            fetch(`/api/projects_settings?id=${id}`, {
                 method: 'GET'
             }).then(res => res.json()).then(json => {
                 setProjects(json);
@@ -227,9 +225,19 @@ export default function ProjectsSettings() {
                 }
 
                 {
-                    projects?.length > 0 ?
-                        projects?.map((project) => (
-                            <ProjectCard/>
+                    projects.length !== 0 ?
+                        projects.map((project) => (
+                            <ProjectCard
+                                id={project.id}
+                                key={project.id}
+                                user_id={project.user_id}
+                                name={project.name}
+                                demo_url={project.demo_url}
+                                description={project.description}
+                                repository_url={project.repository_url}
+                                img_url={project.img_url}
+                                onClick={() => alert("clickerd")}
+                            />
                         ))
                         :
                         (
