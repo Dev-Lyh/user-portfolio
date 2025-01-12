@@ -19,7 +19,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 const imgRef = ref(storage, `profiles/${id}/profile_picture`);
                 try {
                     user.img_url = await getDownloadURL(imgRef); // Tenta obter a URL
-                    console.log(user)
                     return res.status(200).json({...user});
                 } catch (error) {
                     if (error.code === "storage/object-not-found") {

@@ -64,7 +64,7 @@ export default function Input({
     <>
       <input className={styles.input} type={type} placeholder={placeholder} onChange={onChangeValue}
              style={{marginTop: placeholder.includes('Enter a new password') ? '2.6rem' : 0}}
-             defaultValue={inputValue} disabled={disabled}/>
+             value={inputValue} disabled={disabled}/>
       {
         mode === 'CREATE' &&
         type === 'password' &&

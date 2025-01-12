@@ -1,67 +1,35 @@
 import {NextApiRequest, NextApiResponse} from "next";
-import formidable, {Fields, Files} from "formidable";
-import fs from "fs";
-import {ref, uploadBytes} from "firebase/storage";
-import {db, storage} from "../../../firebaseConfig"
-import {updateDoc, doc} from "firebase/firestore"
-
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
+import {ref, deleteObject} from "firebase/storage";
+import {db, storage} from "../../../firebaseConfig";
+import {getDoc, doc, deleteDoc} from "firebase/firestore";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method === "POST") {
-    const {id} = req.query;
-    const form = formidable({
-      multiples: false,
-      uploadDir: "./uploads",
-      keepExtensions: true,
-    });
+  const {id} = req.query;
 
-    if (!id || typeof id !== "string") {
-      return res.status(400).json({error: "Invalid or missing user ID"});
-    }
+  if (!id || typeof id !== "string") {
+    return res.status(404).json({error: "Id não encontrado"});
+  }
 
+  if (req.method === "DELETE") {
     try {
-      const {fields, files} = await new Promise<{
-        fields: Fields;
-        files: Files;
-      }>((resolve, reject) => {
-        form.parse(req, (err, fields, files) => {
-          if (err) reject(err);
-          resolve({fields, files});
-        });
-      });
+      const projectRef = doc(db, "projects", id);
+      const projectSnapshot = await getDoc(projectRef);
 
-      const {name, bio, job_title} = fields;
-      if (!name || !bio || !job_title) {
-        return res.status(400).json({error: "Nome e biografia são obrigatórios."});
+      if (!projectSnapshot.exists()) {
+        return res.status(404).json({error: "Projeto não encontrado"});
       }
 
-      const file = Array.isArray(files.file) ? files.file[0] : files.file;
-      let fileUrl = null;
-
-      if (file) {
-        const fileBuffer = await fs.promises.readFile(file.filepath);
-        if (file.originalFilename) {
-          fileUrl = `profiles/${id}/profile_picture`;
-          const storageRef = ref(storage, fileUrl);
-          await uploadBytes(storageRef, fileBuffer);
-        }
+      const imgUrl = projectSnapshot.data().img_url;
+      if (imgUrl) {
+        const imgRef = ref(storage, imgUrl);
+        await deleteObject(imgRef);
       }
 
-      const profile = {
-        name: name[0],
-        bio: bio[0],
-        job_title: job_title[0],
-        img_url: fileUrl,
-      };
-      await updateDoc(doc(db, "users", id), profile)
+      await deleteDoc(projectRef);
 
-      return res.status(200).json({message: "Perfil cadastrado com sucesso", profile});
+      return res.status(200).json({message: "Deletado com sucesso"});
     } catch (error) {
+      console.error("Erro ao deletar projeto:", error);
       return res.status(500).json({error});
     }
   } else {

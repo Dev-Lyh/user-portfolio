@@ -12,4 +12,14 @@
   padding: .8rem 0;
   margin-top: 2.6rem;
   margin-bottom: 2.4rem;
+  box-shadow: 0 .4rem .4rem -.1rem #11172920;
+  font-weight: 600;
+  transition: all .3s ease-in-out;
+}
+
+
+.button:hover {
+  box-shadow: 0 .4rem .4rem -.1rem #11172900;
+  cursor: pointer;
+  transition: all .3s ease-in-out;
 }

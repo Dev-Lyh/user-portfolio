@@ -77,7 +77,7 @@
   gap: 1.2rem;
 }
 
-.action_buttons_container button {
+.action_buttons_container > button {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -114,4 +114,11 @@
   width: fit-content;
   margin-bottom: 0;
   font-size: 1.4rem;
+}
+
+.container_project_actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: .8rem;
 }

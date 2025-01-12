@@ -3,7 +3,7 @@ import {db, storage} from '../../../firebaseConfig';
 import {getDocs, query, where, collection, addDoc, updateDoc, doc} from 'firebase/firestore';
 import {Project} from "@/types/Project"
 import formidable, {Fields, Files} from "formidable";
-import {ref, uploadBytes, getDownloadURL} from "firebase/storage";
+import {ref, uploadBytes, getDownloadURL, deleteObject} from "firebase/storage";
 
 import fs from "fs";
 
@@ -74,16 +74,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
 
       const file = Array.isArray(files.file) ? files.file[0] : files.file;
-      let fileUrl = null;
-
-      if (file) {
-        const fileBuffer = await fs.promises.readFile(file.filepath);
-        if (file.originalFilename) {
-          fileUrl = `projects/${user_id[0]}/${name[0].replace(" ", "_")}`;
-          const storageRef = ref(storage, fileUrl);
-          await uploadBytes(storageRef, fileBuffer);
-        }
-      }
+      let fileUrl = "";
 
       const project = {
         user_id: user_id[0],
@@ -96,11 +87,31 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       if (id) {
         const docRef = doc(db, "projects", id[0]);
+        project.img_url = `projects/${user_id[0]}/${id[0]}`
         await updateDoc(docRef, project);
+        const imgRef = ref(storage, `projects/${user_id[0]}/${id[0]}`)
+        await deleteObject(imgRef)
+        if (file) {
+          const fileBuffer = await fs.promises.readFile(file.filepath);
+          if (file.originalFilename) {
+            fileUrl = `projects/${user_id[0]}/${id[0]}`;
+            const storageRef = ref(storage, fileUrl);
+            await uploadBytes(storageRef, fileBuffer);
+          }
+        }
         return res.status(200).json({...project, id: id[0]});
       } else {
+        project.img_url = `projects/${user_id[0]}/${project_id}`
         const docRef = await addDoc(collection(db, "projects"), project);
         const project_id = docRef.id;
+        if (file) {
+          const fileBuffer = await fs.promises.readFile(file.filepath);
+          if (file.originalFilename) {
+            fileUrl = `projects/${user_id[0]}/${project_id}`;
+            const storageRef = ref(storage, fileUrl);
+            await uploadBytes(storageRef, fileBuffer);
+          }
+        }
         return res.status(200).json({message: project_id});
       }
 

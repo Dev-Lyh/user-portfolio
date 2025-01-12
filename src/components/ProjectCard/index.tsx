@@ -1,30 +1,38 @@
 import {Project} from "@/types/Project"
 import Image from "next/image"
+import PencilIcon from "@/assets/PencilIcon";
+import styles from "./project_card.module.css"
 
-interface ProjectCardProps extends Project {
-  onClick(): void;
+interface ProjectCardProps {
+  id: string;
+  project: Project;
+
+  onEdit(id: string, project: Project): void;
 }
 
 export default function ProjectCard({
                                       id,
-                                      user_id,
-                                      name,
-                                      description,
-                                      demo_url,
-                                      repository_url,
-                                      img_url
+                                      project,
+                                      onEdit
                                     }: ProjectCardProps) {
   return (
-    <div>
+    <div className={styles.container_project_item}>
       <Image
-        src={img_url}
+        src={project.img_url}
         width={217}
         height={138}
-        alt={name}
+        alt={project.name}
+        style={{borderRadius: ".8rem"}}
       />
-      <div>
-        <strong>{name}</strong>
-        <p>{description}</p>
+      <div className={styles.container_project_details}>
+        <div>
+          <strong>{project.name}</strong>
+          <p>{project.description}</p>
+        </div>
+        <button type={"button"} className={`white_button`} onClick={() => onEdit(id, project)}>
+          <PencilIcon/>
+          Edit
+        </button>
       </div>
     </div>
   )

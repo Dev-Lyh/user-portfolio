@@ -1,8 +1,8 @@
 export const uploadProjects = async (file: File, name: string, repository_url: string, demo_url: string, description: string, user_id: string, id?: string) => {
 
-  if (!file) {
-    throw new Error("Arquivo de foto de perfil obrigatório!");
-  }
+//  if (!file) {
+//    throw new Error("Arquivo de foto de perfil obrigatório!");
+//  }
 
   const formData = new FormData();
   formData.append("file", file);
