@@ -20,6 +20,7 @@ import TrashGrayIcon from "@/assets/TrashGrayIcon";
 import ProjectCard from "@/components/ProjectCard";
 import CloseIcon from "@/assets/CloseIcon";
 import CheckWhiteIcon from "@/assets/CheckWhiteIcon";
+import Notification from "@/components/Notification";
 
 export default function ProjectsSettings() {
   const [user, setUser] = useState<User>(userMock);
@@ -30,6 +31,7 @@ export default function ProjectsSettings() {
   const [file, setFile] = useState<File>();
   const [formToEdit, setFormToEdit] = useState(false)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [showNotification, setShowNotification] = useState(false);
   const MAX_FILE_SIZE = 2 * 1024 * 1024;
 
   const router = useRouter();
@@ -84,7 +86,6 @@ export default function ProjectsSettings() {
     }
   }, [id])
 
-
   function handleEditProject(id: string, project: Project) {
     setProjectId(id);
     setProject(project);
@@ -96,7 +97,7 @@ export default function ProjectsSettings() {
     if (!formToEdit) {
       setProjectId("");
       setProject(projectMock);
-      setPreviewUrl("")
+      setPreviewUrl("");
     }
     setFormToEdit(!formToEdit)
   }
@@ -104,13 +105,32 @@ export default function ProjectsSettings() {
   function handleDeleteProject() {
     fetch(`/api/projects_settings/${projectId}`, {
       method: "DELETE"
-    }).then(res => res.json).catch(err => console.error(err))
+    }).then(res => res.json()).then(
+      json => {
+        const newState = projects.filter(project => project.id !== json.project_id);
+        setProjects(newState);
+        setProject(projectMock);
+        setProjectId("");
+        setPreviewUrl("");
+        setFormToEdit(false);
+
+        setShowNotification(true);
+        setTimeout(() => setShowNotification(false), 4000);
+      }
+    ).catch(err => console.error(err))
   }
 
   return (
     <section>
-      <Header user={user} id={id}/>
+      {
+        id &&
+        <Header user={user} id={id}/>
+      }
       <section className={styles.general_container}>
+        {showNotification && (
+          <Notification color="#FFFFFF" content="Content deleted" title="Content deleted"/>
+        )}
+
         <h1>Projects settings</h1>
         <button className={styles.button_to_add_project} onClick={handleToggleEditForm}>
           {
@@ -244,8 +264,13 @@ export default function ProjectsSettings() {
               <div className={styles.purple_button_container}>
                 <button type="button" className={`purple_button`}
                         onClick={() => {
-                          uploadProjects(file, project.name, project.repository_url, project.demo_url, project.description, id, projectId)
-
+                          if (!file) {
+                            alert("Precisa de um Arquivo")
+                          } else {
+                            uploadProjects(file, project.name, project.repository_url, project.demo_url, project.description, id, projectId)
+                              .then(res => setProjects(prevState => [...prevState, res]))
+                              .catch((err) => console.error(err))
+                          }
                         }}>
                   {
                     projectId ? (

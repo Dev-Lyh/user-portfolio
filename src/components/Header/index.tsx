@@ -67,7 +67,7 @@ export default function HeaderComponent({id, user}: HeaderProps) {
                                 <ProjectIcon/>
                                 <p>Projects settings</p>
                             </button>
-                            <button type={'button'}>
+                            <button type={'button'} onClick={() => router.push(`/portfolio/${id}`)}>
                                 <MyPortfolioIcon/>
                                 <p>My Portfolio</p>
                                 <LinkIcon/>

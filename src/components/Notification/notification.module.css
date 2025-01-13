@@ -1,0 +1,47 @@
+.notification_container {
+  background: #ffffff;
+  width: fit-content;
+  padding: 1.6rem;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  border-radius: 0.8rem;
+  position: absolute;
+  top: 12rem;
+  right: 12rem;
+  border: 0.1rem solid #e3e8ef;
+  box-shadow: 0 0.4rem 0.4rem -0.1rem #11172915;
+  animation: slideIn 0.5s ease-out, fadeOut 3s 2.5s forwards;
+  opacity: 1;
+}
+
+.notification_container strong {
+  color: #dd524c;
+  font-size: 1.6rem;
+}
+
+.notification_container small {
+  font-size: 1.4rem;
+  color: #677489;
+}
+
+@keyframes slideIn {
+  0% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0%);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}

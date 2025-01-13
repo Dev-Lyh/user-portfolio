@@ -27,7 +27,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       await deleteDoc(projectRef);
 
-      return res.status(200).json({message: "Deletado com sucesso"});
+      return res.status(200).json({message: "Deletado com sucesso", project_id: id});
     } catch (error) {
       console.error("Erro ao deletar projeto:", error);
       return res.status(500).json({error});

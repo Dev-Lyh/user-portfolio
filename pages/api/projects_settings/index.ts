@@ -76,44 +76,65 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const file = Array.isArray(files.file) ? files.file[0] : files.file;
       let fileUrl = "";
 
+      const getFileBuffer = async (file: any) => {
+        if (!file || !file.originalFilename) return null;
+        return await fs.promises.readFile(file.filepath);
+      };
+
+      const uploadFileToStorage = async (fileBuffer: Buffer, filePath: string) => {
+        const storageRef = ref(storage, filePath);
+        await uploadBytes(storageRef, fileBuffer);
+      };
+
+      const deleteFileFromStorage = async (filePath: string) => {
+        const storageRef = ref(storage, filePath);
+        await deleteObject(storageRef);
+      };
+
       const project = {
         user_id: user_id[0],
         name: name[0],
         repository_url: repository_url[0],
         demo_url: demo_url[0],
         description: description[0],
-        img_url: fileUrl,
+        img_url: "",
       };
 
       if (id) {
-        const docRef = doc(db, "projects", id[0]);
-        project.img_url = `projects/${user_id[0]}/${id[0]}`
+        const projectId = id[0];
+        const docRef = doc(db, "projects", projectId);
+
+        project.img_url = `projects/${user_id[0]}/${projectId}`;
+
+        await deleteFileFromStorage(project.img_url);
+
+        const fileBuffer = await getFileBuffer(file);
+        if (fileBuffer) {
+          fileUrl = project.img_url;
+          await uploadFileToStorage(fileBuffer, fileUrl);
+        }
+
         await updateDoc(docRef, project);
-        const imgRef = ref(storage, `projects/${user_id[0]}/${id[0]}`)
-        await deleteObject(imgRef)
-        if (file) {
-          const fileBuffer = await fs.promises.readFile(file.filepath);
-          if (file.originalFilename) {
-            fileUrl = `projects/${user_id[0]}/${id[0]}`;
-            const storageRef = ref(storage, fileUrl);
-            await uploadBytes(storageRef, fileBuffer);
-          }
-        }
-        return res.status(200).json({...project, id: id[0]});
+        return res.status(200).json({...project, id: projectId});
       } else {
-        project.img_url = `projects/${user_id[0]}/${project_id}`
         const docRef = await addDoc(collection(db, "projects"), project);
-        const project_id = docRef.id;
-        if (file) {
-          const fileBuffer = await fs.promises.readFile(file.filepath);
-          if (file.originalFilename) {
-            fileUrl = `projects/${user_id[0]}/${project_id}`;
-            const storageRef = ref(storage, fileUrl);
-            await uploadBytes(storageRef, fileBuffer);
-          }
+        const projectId = docRef.id;
+
+        project.img_url = `projects/${user_id[0]}/${projectId}`;
+
+        await updateDoc(doc(db, "projects", projectId), {
+          img_url: project.img_url
+        })
+
+        const fileBuffer = await getFileBuffer(file);
+        if (fileBuffer) {
+          fileUrl = project.img_url;
+          await uploadFileToStorage(fileBuffer, fileUrl);
         }
-        return res.status(200).json({message: project_id});
+
+        return res.status(200).json({...project, id: projectId});
       }
+
 
     } catch (error) {
       return res.status(500).json({error});
